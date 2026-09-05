@@ -139,11 +139,12 @@ class BaseRobot {
         //Driving input 
         //TODO: Read joystick x and y axis values and assign them to respective j-variable. REMINDER: jx jy is for left joystick, the others for right joystick
         //FYI They're all set to zero for now so that it compiles
-        jx = 0;
-        jy = 0;
+        jx = remote_.getJoystickValue(DJIRemote2::Joystick::LEFT_HORIZONTAL);
+        jy = remote_.getJoystickValue(DJIRemote2::Joystick::LEFT_VERTICAL);
         //Pitch, Yaw
-        jpitch = 0;
-        jyaw = 0;
+        jpitch = remote_.getJoystickValue(DJIRemote2::Joystick::RIGHT_HORIZONTAL);
+        jyaw = remote_.getJoystickValue(DJIRemote2::Joystick::RIGHT_VERTICAL);
+
 
 
         //Deadzones provided for you 
@@ -155,9 +156,13 @@ class BaseRobot {
         
         //Bounding the four j variables
         //TODO: Make sure they're all on [-1, 1] range
-        jx = 0;
-        jy = 0;
-        jpitch = 0;
-        jyaw = 0;
+        jx = fmin(jx,1);
+        jx = fmax(-1, jx);
+        jy = fmin(jy,1);
+        jy = fmax(-1, jy);
+        jpitch = fmin(jpitch,1);
+        jpitch = fmax(-1, jpitch);
+        jyaw = fmin(jyaw,1);
+        jyaw = fmax(-1, jyaw);
     }
 };
