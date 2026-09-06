@@ -4,6 +4,9 @@
 BNO055::BNO055(I2C &i2c, uint8_t addr, PinName p_reset) noexcept
     : IMU(), _i2c(i2c), chip_addr(addr), _res(p_reset), cantReadDataCount(0)
 {
+}
+
+void BNO055 :: init() noexcept {
     _i2c.frequency(100000);
 
     _res.write(0);
@@ -12,15 +15,12 @@ BNO055::BNO055(I2C &i2c, uint8_t addr, PinName p_reset) noexcept
 
     ThisThread::sleep_for(650ms);
 
-}
-void BNO055 :: init() noexcept {
-
     char config_mode[] ={0x3D, 0x00};
-    _i2c.write(chip_addr << 1, config_mode, 2, false);
+    _i2c.write(chip_addr , config_mode, 2, false);
     ThisThread :: sleep_for(19ms);
 
     char dof_mode[]  = {0x3D, 0x0C};
-    _i2c.write(chip_addr << 1, dof_mode, 2, false);
+    _i2c.write(chip_addr , dof_mode, 2, false);
     ThisThread :: sleep_for(9ms);
 
 }
@@ -43,7 +43,7 @@ void BNO055 :: get_accel(BNO055_VECTOR_TypeDef *la) {
 
     char accel[] = {0x08};
     int16_t x,y,z;
-    int writeResult = _i2c.write(chip_addr << 1, accel, 1, true);
+    int writeResult = _i2c.write(chip_addr , accel, 1, true);
 
     if (!writeResult)  {
         if (cantReadDataCount > 0) {
@@ -52,14 +52,14 @@ void BNO055 :: get_accel(BNO055_VECTOR_TypeDef *la) {
             cantReadDataCount = 0;
         }
     
-        _i2c.read(chip_addr << 1 | 1 , dt, 6, false);
+        _i2c.read(chip_addr , dt, 6, false);
         x = dt[1] << 8 | dt[0];
         y = dt[3] << 8 | dt[2];
         z = dt[5] << 8 | dt[4];
 
-        la->x = (double)x / 100;
-        la->y = (double)y / 100;
-        la->z = (double)z / 100;
+        la->x = (double)x / 100; // 100LSB per m/s^2
+        la->y = (double)y / 100; // 100LSB per m/s^2
+        la->z = (double)z / 100; // 100LSB per m/s^2
     }
     else{
         cantReadDataCount ++;
@@ -71,16 +71,16 @@ void BNO055 :: get_gyro(BNO055_VECTOR_TypeDef *gr){
     int16_t x,y,z;
     char gyro[] = {0x14};
 
-    _i2c.write(chip_addr << 1, gyro, 1, true);
-    _i2c.read(chip_addr << 1 | 1, dt, 6, false);
+    _i2c.write(chip_addr , gyro, 1, true);
+    _i2c.read(chip_addr, dt, 6, false);
 
     x = dt[1] << 8 | dt[0];
     y = dt[3] << 8 | dt[2];
     z = dt[5] << 8 | dt[4];
 
-    gr -> x = (double)x / 16.0;
-    gr -> y = (double)y / 16.0;
-    gr -> z = (double)z / 16.0;
+    gr -> x = (double)x / 16.0; //16 LSB/dps
+    gr -> y = (double)y / 16.0; //16 LSB/dps
+    gr -> z = (double)z / 16.0; //16 LSB/dps
 }
 //read override
 IMU :: EulerAngles BNO055 ::  read() {
@@ -95,12 +95,12 @@ IMU :: EulerAngles BNO055 :: getImuAngles(){
 void BNO055 :: change_fusion_mode(uint8_t mode){
     //first change to config mode
     char change[] = {0x3D, 0X00};
-    _i2c.write(chip_addr << 1, change, 2, false);
+    _i2c.write(chip_addr , change, 2, false);
     ThisThread :: sleep_for(19ms);
 
     //then change to the mode
     char change_to_mode[] = {0x3D, (char)mode};
-    _i2c.write(chip_addr << 1, change_to_mode, 2, false);
+    _i2c.write(chip_addr , change_to_mode, 2, false);
     ThisThread :: sleep_for(9ms);
 }
 
