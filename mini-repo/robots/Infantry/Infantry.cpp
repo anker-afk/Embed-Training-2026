@@ -187,13 +187,13 @@ class Infantry : public BaseRobot {
 
         // Turret from remote
         // TODO: IMPLEMENT TURRET LOGIC HERE (Hint: update desired pitch and yaw from remote readings)
-        yaw_desired_angle += jyaw * JOYSTICK_YAW_SENSITIVITY_DPS * 0.002;
+        yaw_desired_angle -= jyaw * JOYSTICK_YAW_SENSITIVITY_DPS * 0.002;
 
 
 
 
 
-        pitch_desired_angle += jpitch * JOYSTICK_PITCH_SENSITIVITY_DPS * 0.002;
+        pitch_desired_angle -= jpitch * JOYSTICK_PITCH_SENSITIVITY_DPS * 0.002;
 
 
 
